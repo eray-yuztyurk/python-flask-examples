@@ -1,6 +1,6 @@
 # Python Flask Exercises
 
-This repository contains a collection of practice exercises built with **Flask**, focusing on routing, HTTP methods, error handling, and working with simple in-memory data structures. The goal of this project is to help you understand how to structure small Flask applications while experimenting with various API behaviors.
+This repository contains a collection of practice exercises built with **Flask**, focusing on routing, HTTP methods, error handling, redirecting, working with forms, and simple in-memory CRUD operations. The goal of this project is to help you understand how to structure small Flask applications and explore a wide range of API behaviors.
 
 ---
 
@@ -10,13 +10,18 @@ This project demonstrates:
 
 * Basic Flask route definitions
 * Returning different response types (string, tuple, `make_response`)
-* Handling query parameters
+* Query parameters & input validation
 * Using Flask's built-in `uuid` converter
-* Simple JSON-based CRUD operations (GET, POST, DELETE)
-* Custom error handlers (404 + global exception handler)
-* How API endpoints behave under different inputs
+* JSON-based CRUD operations (GET, POST, DELETE)
+* Dynamic URL generation via `url_for`
+* Redirecting with `redirect()`
+* Handling form data (`request.form`)
+* Custom error handlers (404 handler + global exception handler)
+* A route that intentionally raises errors for testing
+* Simple HTML examples for CRUD templates (read/update/delete/create)
+* Additional routing examples supporting multiple HTTP methods
 
-All data is stored in memory and resets each time the application restarts. This makes the project ideal for testing and experimentation.
+All data is stored in memory and resets each time the application restarts, making it perfect for testing and experimentation.
 
 ---
 
@@ -60,59 +65,101 @@ http://localhost:5000
 
 ## 📚 Available Endpoints
 
-Below is a quick summary of the API routes included in the project.
+Below is a quick summary of the main API routes included in the project.
+
+---
 
 ### **Root & Utility Routes**
 
-| Method | Route         | Description                         |
-| ------ | ------------- | ----------------------------------- |
-| GET    | `/`           | Simple "hello world!" text response |
-| GET    | `/exp`        | Example using `make_response()`     |
-| GET    | `/no_content` | Returns a tuple-style response      |
+| Method | Route         | Description                                  |
+| ------ | ------------- | -------------------------------------------- |
+| GET    | `/`           | Simple "hello world!" text response          |
+| GET    | `/exp`        | Example using `make_response()`              |
+| GET    | `/no_content` | Returns a tuple-style JSON + status response |
+
+---
 
 ### **Data Inspection Routes**
 
-| Method | Route    | Description                               |
-| ------ | -------- | ----------------------------------------- |
-| GET    | `/data`  | Returns number of users in in-memory data |
-| GET    | `/count` | Same as above, returns user count         |
+| Method | Route         | Description                         |
+| ------ | ------------- | ----------------------------------- |
+| GET    | `/data_count` | Returns number of records in memory |
+| GET    | `/count`      | Same as above, alternative endpoint |
+
+---
 
 ### **Search & Retrieval**
 
-| Method | Route                    | Description                  |
-| ------ | ------------------------ | ---------------------------- |
-| GET    | `/name_search?q=<query>` | Case-insensitive name search |
-| GET    | `/person/<uuid>`         | Fetch a user by UUID         |
+| Method | Route                    | Description                           |
+| ------ | ------------------------ | ------------------------------------- |
+| GET    | `/name_search?q=<query>` | Case-insensitive search by first name |
+| GET    | `/person/<uuid>`         | Fetch a user record by UUID           |
 
-### **Data Modification**
+---
 
-| Method | Route            | Description                      |
-| ------ | ---------------- | -------------------------------- |
-| POST   | `/person`        | Add a new user to in-memory data |
-| DELETE | `/person/<uuid>` | Delete user by UUID              |
+### **Data Modification (CRUD API)**
 
-### **Testing Routes**
+| Method | Route            | Description                |
+| ------ | ---------------- | -------------------------- |
+| POST   | `/person`        | Add a new user (JSON body) |
+| DELETE | `/person/<uuid>` | Delete a user by UUID      |
 
-| Method | Route         | Description                                               |
-| ------ | ------------- | --------------------------------------------------------- |
-| GET    | `/testing500` | Manually triggers an exception to test the global handler |
+---
+
+### **Form & HTML Based Routes**
+
+| Method     | Route          | Description                              |
+| ---------- | -------------- | ---------------------------------------- |
+| POST       | `/user_login`  | Reads form data (`username`, `password`) |
+| GET / POST | `/create`      | Create HTML form → saves record          |
+| GET / POST | `/update/<id>` | Update record via HTML form              |
+| POST       | `/delete/<id>` | Delete using HTML form submission        |
+| GET        | `/read/<id>`   | Render a record using template           |
+
+(Functions such as `get_record`, `update_record`, `delete_record`, `create_new_record` are placeholders for demonstration.)
+
+---
+
+### **Redirecting & URL Generation**
+
+| Method | Route          | Description                        |
+| ------ | -------------- | ---------------------------------- |
+| GET    | `/admin`       | Redirects to `/login_user`         |
+| GET    | `/admin_login` | Redirects using `url_for()`        |
+| GET    | `/login_user`  | Returns a simple login placeholder |
+
+---
+
+### **Method Handling Examples**
+
+| Method(s)  | Route   | Description                                       |
+| ---------- | ------- | ------------------------------------------------- |
+| GET / POST | `/data` | Example of handling two HTTP methods in one route |
+
+---
+
+### **Error Handling**
+
+| Handler | Purpose                                 |
+| ------- | --------------------------------------- |
+| 404     | Custom “API not found” JSON response    |
+| 500     | Global exception handler (catch-all)    |
+| GET     | `/testing500` → manually triggers error |
 
 ---
 
 ## 🧪 Example cURL Commands
 
-Below are a few sample commands you can use to test the API.
-
-### **Get all user count**
+### **Get user count**
 
 ```
-curl -X GET localhost:5000/data
+curl -X GET localhost:5000/data_count
 ```
 
 ### **Search for a user**
 
 ```
-curl -X GET "localhost:5000/name_search?q=Abdel"
+curl -X GET "localhost:5000/name_search?q=Lukas"
 ```
 
 ### **Add a new user**
@@ -140,6 +187,12 @@ curl -X POST \
 curl -X DELETE localhost:5000/person/<uuid-here>
 ```
 
+### **Trigger the global exception handler**
+
+```
+curl -X GET localhost:5000/testing500
+```
+
 ---
 
 ## 📂 Project Structure
@@ -157,16 +210,14 @@ python-flask-exercises/
 
 ## 📝 Notes
 
-* This project is meant for educational and practice purposes.
-* Since it uses in-memory data, any restart of the server resets all data changes.
+* This project is for educational and practice purposes.
+* Since all data lives in memory, the dataset resets on every restart.
+* Examples include HTML forms, redirecting, CRUD templates, and error testing.
 * Feel free to fork and extend the project for learning.
 
 ---
 
 ## 📄 License
 
-This project is provided for educational purposes. You may modify and reuse it freely.
-
----
-
-If you'd like, I can now generate **requirements.txt**, **.gitignore**, and an optional **EXAMPLES.md** as separate canvas files.
+This project is provided for educational purposes.
+You may modify and reuse it freely.
