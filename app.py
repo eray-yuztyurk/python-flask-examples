@@ -384,3 +384,82 @@ Terminal >>>
 curl http://localhost:5000/testing500
 '''
 #---------------------------------------------------------------------------------------
+
+########################################################################################
+# ADDITIONAL FEATURES
+########################################################################################
+# Getting data from Form via flask.request.form
+########################################################################################
+'''
+HTML Form Sample
+
+<form method="POST" action="/login">
+    <input type="text" name="username">
+    <input type="password" name="password">
+    <input type="submit" value="Submit">
+</form>
+'''
+from flask import request
+
+@app.route('/login', method=['POST'])
+def login_user():
+    user_name = request.form('username')
+    password = request.form('password')
+    # codes to run login process...
+
+########################################################################################
+# URL redirecting via flask.redirect
+########################################################################################
+
+from flask import redirect
+
+@app.route("/admin")
+def redirect_admin():
+    return redirect("/login")
+
+########################################################################################
+# Setting Dynamic URL via flask.url_for
+########################################################################################
+# Useful when the URL for a route is altered
+
+from flask import url_for
+
+@app.route("/admin")
+def login_admin():
+    return redirect(url_for("/login"))
+
+@app.route("/login")
+def login_user()
+    return "<Login>"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
