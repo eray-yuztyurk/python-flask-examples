@@ -24,6 +24,7 @@ from flask import Flask, make_response,request
 
 # Create an instance of the Flask class
 app = Flask(__name__)
+#app = Flask("Flask Examples")
 
 ########################################################################################
 # Defining a route for the root URL ("/") - Using string as return
@@ -145,7 +146,7 @@ data = [
 ########################################################################################
 # Returning count of users in data ("/data")
 ########################################################################################
-@app.route("/data")
+@app.route("/data_count")
 def get_data():
     try:
         if data and len(data) > 0:
@@ -391,7 +392,7 @@ curl http://localhost:5000/testing500
 # Getting data from Form via flask.request.form
 ########################################################################################
 '''
-HTML Form Sample
+-- HTML Sample --
 
 <form method="POST" action="/login">
     <input type="text" name="username">
@@ -401,45 +402,119 @@ HTML Form Sample
 '''
 from flask import request
 
-@app.route('/login', method=['POST'])
-def login_user():
-    user_name = request.form('username')
-    password = request.form('password')
+@app.route('/user_login', methods=['POST'])
+def user_login():
+    user_name = request.form['username']
+    password = request.form['password']
     # codes to run login process...
 
 ########################################################################################
 # URL redirecting via flask.redirect
 ########################################################################################
+# Returns HTTP response -> HTTP 302
 
 from flask import redirect
 
 @app.route("/admin")
 def redirect_admin():
-    return redirect("/login")
+    return redirect("/login_user")
 
 ########################################################################################
 # Setting Dynamic URL via flask.url_for
 ########################################################################################
-# Useful when the URL for a route is altered
+# Useful when the URL for a route is altered.
+# Returns URL as string then
 
 from flask import url_for
 
-@app.route("/admin")
-def login_admin():
-    return redirect(url_for("/login"))
+@app.route("/admin_login")
+def redirecting_admin():
+    return redirect(url_for("login_user"))
 
-@app.route("/login")
-def login_user()
+@app.route("/login_user")
+def login_user():
     return "<Login>"
 
+########################################################################################
+# Dealing with different methods
+########################################################################################
+
+@app.route("/data", methods=["GET", "POST"])
+def data_get_post():
+    if request.method == "GET":
+        pass # do something
+    if request.method == "POST":
+        pass # do something else
+
+########################################################################################
+# CRUD OPERATIONS
+########################################################################################
+# READ
+########################################################################################
+from flask import render_template
+
+@app.route("/read/<int:id>", methods=["GET"])
+def read(id):
+    record = get_record(id) # assuming that function is predefined
+    return render_template("read.html", record=record)
+
+########################################################################################
+# UPDATE
+########################################################################################
+'''
+<form method="POST" action="/update/{{record.id}}">
+    <input type="text" name="name" value="{{record.name}}">
+    <input type="submit" value="Update">
+</form>
+'''
+@app.route("/update/<int:id>", methods=["GET", "POST"])
+def update(id):
+    if request.method == "POST":
+        name = request.form["name"]
+        update_record(id, name) # assuming that the function is predefined
+        return redirect(url_for("read", id=id)) # redirection user to updated record
+    
+    record = get_record(id) # assuming that the function is predefined
+    return render_template("update.html", record=record)
+
+########################################################################################
+# DELETE
+########################################################################################
+'''
+<form method="POST" action="/delete/{{record.id}}">
+    <input type="submit" value="Delete">
+</form>
+'''
+@app.route("/delete/<int:id>", methods=["POST"])
+def delete(id):
+    delete_record(id) # assuming that the function is predefined
+    return redirect(url_for("home")) # redirection user to homepage
+    
+########################################################################################
+# POST
+########################################################################################
+'''
+-- HTML Sample --
+
+<form method="POST" action="/create">
+    <input type="text" name="name">
+    <input type="submit" value="Create">
+</form>
+'''
+@app.route("/create", methods=["GET", "POST"])
+def create():
+    if request.method == "POST":
+        name = request.form["name"]
+        record = create_new_record(name) # assuming that function is predefined
+        return redirect(url_for("read", id=record.id)) # redirecting user to new record
+    
+    return render_template("create.html") # render for GET request
 
 
+#---------------------------------------------------------------------------------------
 
-
-
-
-
-
+if __name__ == "__main__":
+    app.run(debug=True)
 
 
 
