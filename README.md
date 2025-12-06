@@ -4,6 +4,24 @@ This repository contains a collection of practice exercises built with **Flask**
 
 ---
 
+## Table of Contents
+- [Overview](#overview)
+- [Getting Started](#getting-started)
+- [Available Endpoints](#available-endpoints)
+  - [Root & Utility Routes](#root--utility-routes)
+  - [Data Inspection Routes](#data-inspection-routes)
+  - [Search & Retrieval](#search--retrieval)
+  - [Data Modification (CRUD API)](#data-modification-crud-api)
+  - [Form & HTML Based Routes](#form--html-based-routes)
+  - [Redirecting & URL Generation](#redirecting--url-generation)
+  - [Method Handling Examples](#method-handling-examples)
+  - [Error Handling](#error-handling)
+- [Example cURL Commands](#example-curl-commands)
+- [Project Structure](#project-structure)
+- [Notes](#notes)
+- [License](#license)
+
+  
 ## 📌 Overview
 
 This project demonstrates:
